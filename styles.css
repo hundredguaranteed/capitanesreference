@@ -8,9 +8,9 @@
   --active-fill: #e0d7c6;
   --low-fill: #efd9d2;
   --high-fill: #dbe7ef;
-  --shell-width: 3440px;
+  --shell-width: 4600px;
   --sidebar-width: 248px;
-  --table-max-width: 2600px;
+  --table-max-width: 4200px;
   --shell-gap: 96px;
   --num-col-width: 42px;
   --small-col-width: 36px;
@@ -322,6 +322,10 @@ a,
   margin-right: auto;
 }
 
+.multi-pill-group--select:not([open]) > :not(summary) {
+  display: none;
+}
+
 .multi-filter-select {
   max-height: 168px;
   padding: 3px 4px;
@@ -345,6 +349,11 @@ a,
 .multi-filter-bulk-actions {
   justify-content: center;
   margin: 4px 0;
+}
+
+.link-button.is-active {
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 .multi-filter-option {
@@ -530,6 +539,7 @@ a,
   max-width: 980px;
   margin: 0 auto 6px;
   line-height: 1.2;
+  white-space: pre-line;
 }
 
 .finder-title {
@@ -660,6 +670,24 @@ a,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] td[data-column="league_name"],
+#statsTable[data-dataset-id="capitanesreference"] td[data-column="team_name"],
+#statsTable[data-dataset-id="capitanesreference"] td[data-column="nationality"],
+#statsTable[data-dataset-id="capitanesreference"] td[data-column="nationality_list"] {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-size: 7.7px;
+  line-height: 1.05;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] th[data-sort="league_name"],
+#statsTable[data-dataset-id="capitanesreference"] th[data-sort="team_name"],
+#statsTable[data-dataset-id="capitanesreference"] th[data-sort="nationality"],
+#statsTable[data-dataset-id="capitanesreference"] th[data-sort="nationality_list"] {
+  white-space: normal;
 }
 
 #statsTable td.cell-team-overflow {
@@ -1004,6 +1032,30 @@ a,
   min-width: 4.4ch;
   padding: 1px 0;
   text-align: center;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] .split-display {
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  min-width: 0;
+  width: 100%;
+  font-size: 6.6px;
+  line-height: 0.98;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] .split-display__pair {
+  grid-template-columns: auto 0.8ch auto;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] .split-display__sep {
+  width: 0.8ch;
+}
+
+#statsTable[data-dataset-id="capitanesreference"] .split-display__pct {
+  min-width: 0;
+  padding: 0;
+  font-size: 7.1px;
 }
 
 .player-profile-sort-button {

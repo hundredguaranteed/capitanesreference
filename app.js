@@ -18,13 +18,14 @@ const GRASSROOTS_SEARCH_PREFETCH_MAX_PREFIX_YEARS = 16;
 const NBA_COMPANION_INITIAL_D1_YEARS = 4;
 const HOME_ID = "home";
 const PROFILE_ROUTE_ID = "profile";
+const MULTI_FILTER_NONE_VALUE = "__none__";
 const HOME_PAGES = [
   { id: "capitanesreference", label: "Capitanes Reference" },
 ];
 const D1_HM_CONFS = new Set(["ACC", "SEC", "B10", "B12", "BE", "P12", "P10"]);
 const D1_HMM_CONFS = new Set(["WCC", "A10", "MWC"]);
 const MINUTES_DEFAULT = 200;
-const TABLE_FRAME_LIMIT = 2580;
+const TABLE_FRAME_LIMIT = 4200;
 const COLOR_SCALE_MAX_ROWS = 2000;
 const STATUS_REALGM_INDEX_SCRIPT = "data/vendor/status_realgm_index.js";
 const STATUS_ANNOTATIONS_SCRIPT = "data/vendor/status_annotations.js";
@@ -38,7 +39,7 @@ const PLAYER_PROFILE_BUCKET_MANIFEST_SCRIPT = "data/vendor/player_profile_bucket
 const D1_FOUL_LOOKUP_SCRIPT = "data/vendor/d1_foul_lookup.js";
 const D1_BART_SPLITS_MANIFEST_SCRIPT = "data/vendor/d1_bart_splits_manifest.js";
 const D1_CAREER_ROWS_SCRIPT = "data/vendor/d1_career_rows.js";
-const APP_BUILD_VERSION = "20260527-capitanes-v3";
+const APP_BUILD_VERSION = "20260527-capitanes-v5";
 const SCRIPT_CACHE_BUST = APP_BUILD_VERSION;
 const DATA_ASSET_BASE = typeof window !== "undefined" && typeof window.__DATA_ASSET_BASE__ === "string"
   ? window.__DATA_ASSET_BASE__.trim().replace(/\/+$/, "")
@@ -143,6 +144,7 @@ const SHARED_SINGLE_FILTERS = [
     label: "Color mode",
     defaultValue: "overall",
     options: [
+      { value: "none", label: "None" },
       { value: "year", label: "PCT by year" },
       { value: "year_position", label: "PCT by year+pos" },
       { value: "position", label: "PCT by pos" },
@@ -2348,8 +2350,54 @@ function buildInternationalConfig() {
 }
 
 function buildCapitanesReferenceConfig() {
-  const demoColumns = ["league_name", "team_name", "nationality", "height_in", "weight_lb", "age", "gp", "min", "mpg"];
-  const advancedColumns = ["wins", "losses", "win_pct", "ows", "dws", "ws", "orb_pct", "drb_pct", "trb_pct", "ast_pct", "tov_pct", "stl_pct", "blk_pct", "usg_pct", "ppr", "pps", "ortg", "drtg", "ediff", "fic", "per", "porpag"];
+  const demoColumns = ["league_name", "team_name", "nationality", "height_in", "weight_lb", "age", "gp", "mpg"];
+  const advancedColumns = [
+    "win_pct",
+    "orb_pct",
+    "drb_pct",
+    "trb_pct",
+    "ast_pct",
+    "tov_pct",
+    "a_to",
+    "ppr",
+    "stl_pct",
+    "blk_pct",
+    "usg_pct",
+    "hob",
+    "pf_per40",
+    "per",
+    "porpag",
+    "ows_per40",
+    "dws_per40",
+    "ws_per40",
+    "ediff",
+    "ortg",
+    "drtg",
+    "fic",
+    "pps",
+    "wins",
+    "losses",
+  ];
+  const advancedDefaultColumns = [
+    "win_pct",
+    "orb_pct",
+    "drb_pct",
+    "trb_pct",
+    "ast_pct",
+    "tov_pct",
+    "a_to",
+    "ppr",
+    "stl_pct",
+    "blk_pct",
+    "usg_pct",
+    "pf_per40",
+    "per",
+    "porpag",
+    "ows_per40",
+    "dws_per40",
+    "ws_per40",
+    "ediff",
+  ];
   const shootingColumns = ["fg_pct", "fga", "fgm", "two_p_pct", "two_pa", "two_pm", "three_p_pct", "three_pa", "three_pm", "ft_pct", "fta", "ftm", "efg_pct", "ts_pct", "total_s_pct", "ftr", "three_pr"];
   const defaultVisible = [
     "rank",
@@ -2361,18 +2409,13 @@ function buildCapitanesReferenceConfig() {
     "weight_lb",
     "age",
     "gp",
-    "min",
     "mpg",
-    ...advancedColumns,
+    ...advancedDefaultColumns,
     "two_p_pct",
-    "two_pa",
     "three_p_pct",
-    "three_pa",
     "ft_pct",
-    "fta",
     "efg_pct",
     "ts_pct",
-    "a_to",
     "ftr",
     "three_pr",
     "pts_per40",
@@ -2396,34 +2439,28 @@ function buildCapitanesReferenceConfig() {
     minuteDefault: 0,
     minuteFilterDefault: 0,
     demoColumns,
-    demoFilterColumns: ["height_in", "weight_lb", "age", "gp", "min", "mpg"],
+    demoFilterColumns: ["height_in", "weight_lb", "age", "gp", "mpg"],
     demoFilterDefaults: {
       age: { min: 22.5 },
     },
     groups: [
       {
-        id: "identity",
-        label: "Identity",
-        columns: ["league_name", "league_list", "team_name", "team_abbrev", "nationality", "nationality_list", "nationality_regions", "height_in", "weight_lb", "dob", "age", "gp", "min", "mpg", "potential_latino_name"],
-        defaultColumns: ["league_name", "team_name", "nationality", "height_in", "weight_lb", "age", "gp", "min", "mpg"],
-      },
-      {
         id: "advanced",
         label: "Advanced",
         columns: advancedColumns,
-        defaultColumns: advancedColumns,
+        defaultColumns: advancedDefaultColumns,
       },
       {
         id: "shooting",
         label: "Shooting",
         columns: shootingColumns,
-        defaultColumns: ["two_p_pct", "two_pa", "three_p_pct", "three_pa", "ft_pct", "fta", "efg_pct", "ts_pct", "ftr", "three_pr"],
+        defaultColumns: ["two_p_pct", "three_p_pct", "ft_pct", "efg_pct", "ts_pct", "ftr", "three_pr"],
       },
       {
         id: "creation",
         label: "Creation",
-        columns: ["a_to", "ast_to", "stl_to", "ftm_fga", "pts_per40", "trb_per40", "orb_per40", "drb_per40", "ast_per40", "stl_per40", "blk_per40", "stocks_per40", "tov_per40", "pf_per40"],
-        defaultColumns: ["a_to", "pts_per40"],
+        columns: ["stl_to", "ftm_fga", "pts_per40", "trb_per40", "orb_per40", "drb_per40", "ast_per40", "stl_per40", "blk_per40", "stocks_per40", "tov_per40"],
+        defaultColumns: ["pts_per40"],
       },
       {
         id: "summary",
@@ -2440,11 +2477,42 @@ function buildCapitanesReferenceConfig() {
       {
         id: "misc",
         label: "Misc",
-        columns: ["double_doubles", "triple_doubles", "forty_pts_games", "twenty_reb_games", "twenty_ast_games", "five_stl_games", "five_blk_games", "high_game", "techs", "hob"],
+        columns: ["double_doubles", "triple_doubles", "forty_pts_games", "twenty_reb_games", "twenty_ast_games", "five_stl_games", "five_blk_games", "high_game", "techs"],
         defaultColumns: [],
       },
     ],
-    singleFilters: withSingleFilterDefault(withSharedSingleFilters([
+    singleFilters: [
+      {
+        id: "view_mode",
+        label: "View",
+        defaultValue: "player",
+        options: [
+          { value: "player", label: "Player" },
+        ],
+      },
+      {
+        id: "color_mode",
+        label: "Color mode",
+        defaultValue: "overall",
+        options: [
+          { value: "none", label: "None" },
+          { value: "year", label: "PCT by year" },
+          { value: "competition", label: "PCT by comp" },
+          { value: "overall", label: "PCT overall" },
+        ],
+      },
+      {
+        id: "percentile_mode",
+        label: "Switch",
+        defaultValue: "off",
+        options: [
+          { value: "off", label: "Off" },
+          { value: "year_pctile", label: "Year Pctl" },
+          { value: "all_time_pctile", label: "All-time Pctl" },
+          { value: "year_rank", label: "Year Rank" },
+          { value: "all_time_rank", label: "All-time Rank" },
+        ],
+      },
       { id: "status_path", label: "Status", options: STATUS_EVER_FILTER_OPTIONS },
       {
         id: "latino_pool",
@@ -2458,23 +2526,25 @@ function buildCapitanesReferenceConfig() {
       },
       {
         id: "exclude_major_europe",
-        label: "Major Europe",
+        label: "Top Euro",
         defaultValue: "all",
+        hidden: true,
         options: [
-          { value: "all", label: "Include" },
-          { value: "yes", label: "Exclude EL/EC" },
+          { value: "all", label: "Off" },
+          { value: "yes", label: "Exclude" },
         ],
       },
       {
         id: "exclude_major_asia",
-        label: "Major Asia",
+        label: "Top Asia",
         defaultValue: "all",
+        hidden: true,
         options: [
-          { value: "all", label: "Include" },
-          { value: "yes", label: "Exclude B/CBA" },
+          { value: "all", label: "Off" },
+          { value: "yes", label: "Exclude" },
         ],
       },
-    ]), "color_mode", "competition"),
+    ],
     multiFilters: [
       { id: "league_name", label: "League", column: "league_name", renderAsSelect: true },
       { id: "nationality_regions", label: "Region", column: "nationality_regions", renderAsSelect: true, sort: INTERNATIONAL_REGION_ORDER, options: INTERNATIONAL_REGION_ORDER },
@@ -2547,9 +2617,9 @@ function buildCapitanesReferenceConfig() {
       wins: "W",
       losses: "L",
       win_pct: "Win%",
-      ows: "OWS",
-      dws: "DWS",
-      ws: "WS",
+      ows_per40: "OWS/40",
+      dws_per40: "DWS/40",
+      ws_per40: "WS/40",
       orb_pct: "ORB%",
       drb_pct: "DRB%",
       trb_pct: "TRB%",
@@ -2567,7 +2637,6 @@ function buildCapitanesReferenceConfig() {
       per: "PER",
       porpag: "PRPG!",
       a_to: "A:TO",
-      ast_to: "AST/TO",
       stl_to: "STL/TO",
       ftm_fga: "FT/FGA",
       pts_per40: "PTS/40",
@@ -3663,7 +3732,9 @@ function applyRouteParamsToState(dataset, state, params) {
   (dataset.multiFilters || []).forEach((filter) => {
     const value = params.get(`mf.${filter.id}`) ?? params.get(filter.id);
     if (value == null || !(filter.id in state.multiSelects)) return;
-    state.multiSelects[filter.id] = new Set(parseUrlStateList(value));
+    const parsed = new Set(parseUrlStateList(value));
+    const options = getMultiFilterOptions(dataset, filter, state);
+    state.multiSelects[filter.id] = parsed.size === options.length ? new Set() : parsed;
     setChanged();
   });
   Object.keys(state.demoFilters || {}).forEach((column) => {
@@ -3728,6 +3799,8 @@ function setsHaveSameValues(left, right) {
 }
 
 function getDefaultDemoFilterValue(dataset, column, side) {
+  const configured = dataset?.demoFilterDefaults?.[column]?.[side];
+  if (configured != null) return String(configured);
   if (side !== "min") return "";
   const minuteColumn = dataset?.meta?.minuteFilterColumn;
   if (!minuteColumn || column !== minuteColumn) return "";
@@ -10262,7 +10335,7 @@ function renderExtraFilters(dataset, state) {
 
   elements.singleSelectFilters.innerHTML = (dataset.singleFilters || [])
     .map((filter) => {
-      if (filter.id === "view_mode") return "";
+      if (filter.id === "view_mode" || filter.hidden) return "";
       const visibilityColumn = getFilterVisibilityColumn(dataset, filter);
       const visibilityButton = renderFilterVisibilityButton(dataset, state, visibilityColumn);
       const inlineClass = visibilityButton ? " field-stack--inline-toggle" : "";
@@ -10289,15 +10362,21 @@ function renderExtraFilters(dataset, state) {
       const visibilityColumn = getFilterVisibilityColumn(dataset, filter);
       const visibilityButton = renderFilterVisibilityButton(dataset, state, visibilityColumn);
       if (filter.renderAsSelect) {
-        const summary = selected.size ? `${selected.size} selected` : "All";
+        const noneSelected = selected.has(MULTI_FILTER_NONE_VALUE);
+        const effectiveAll = !selected.size;
+        const summary = noneSelected ? "None" : (effectiveAll ? "All" : `${selected.size} selected`);
+        const extraButtons = getMultiFilterQuickActions(dataset, filter, state)
+          .map((action) => `<button class="link-button ${action.active ? "is-active" : ""}" type="button" data-multi-filter-quick="${escapeAttribute(filter.id)}" data-multi-filter-action="${escapeAttribute(action.action)}">${escapeHtml(action.label)}</button>`)
+          .join("");
         const bulkActions = `
           <div class="bulk-actions multi-filter-bulk-actions">
             <button class="link-button" type="button" data-multi-filter-bulk="${escapeAttribute(filter.id)}" data-multi-filter-action="all">All</button>
             <button class="link-button" type="button" data-multi-filter-bulk="${escapeAttribute(filter.id)}" data-multi-filter-action="none">None</button>
+            ${extraButtons}
           </div>
         `;
         const checkboxOptions = options
-          .map((option) => `<label class="multi-filter-option"><input type="checkbox" value="${escapeAttribute(option)}" data-multi-filter-option="${escapeAttribute(filter.id)}"${selected.has(option) ? " checked" : ""}> <span>${escapeHtml(option)}</span></label>`)
+          .map((option) => `<label class="multi-filter-option"><input type="checkbox" value="${escapeAttribute(option)}" data-multi-filter-option="${escapeAttribute(filter.id)}"${(effectiveAll || selected.has(option)) && !noneSelected ? " checked" : ""}> <span>${escapeHtml(option)}</span></label>`)
           .join("");
         return `<details class="multi-pill-group multi-pill-group--select" data-filter-id="${escapeAttribute(filter.id)}"><summary class="multi-filter-summary">${escapeHtml(filter.label)}: ${escapeHtml(summary)}</summary>${visibilityButton}${bulkActions}<div class="multi-filter-select" role="group" aria-label="${escapeAttribute(filter.label)}">${checkboxOptions}</div></details>`;
       }
@@ -10395,8 +10474,20 @@ function renderExtraFilters(dataset, state) {
       const action = button.dataset.multiFilterAction;
       const filter = (dataset.multiFilters || []).find((item) => item.id === filterId);
       if (!filter) return;
-      const options = getMultiFilterOptions(dataset, filter, state);
-      state.multiSelects[filterId] = action === "all" ? new Set(options) : new Set();
+      state.multiSelects[filterId] = action === "none" ? new Set([MULTI_FILTER_NONE_VALUE]) : new Set();
+      renderCurrentDataset();
+    });
+  });
+
+  elements.multiSelectFilters.querySelectorAll("[data-multi-filter-quick]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const filterId = button.dataset.multiFilterQuick;
+      const action = button.dataset.multiFilterAction;
+      const filter = (dataset.multiFilters || []).find((item) => item.id === filterId);
+      if (!filter || !action) return;
+      applyMultiFilterQuickAction(dataset, state, filter, action);
       renderCurrentDataset();
     });
   });
@@ -10406,10 +10497,11 @@ function renderExtraFilters(dataset, state) {
       const filterId = input.dataset.multiFilterOption;
       if (!filterId) return;
       const selected = new Set(Array.from(elements.multiSelectFilters.querySelectorAll(`[data-multi-filter-option="${CSS.escape(filterId)}"]:checked`)).map((option) => option.value).filter(Boolean));
-      state.multiSelects[filterId] = selected;
       const filter = (dataset.multiFilters || []).find((item) => item.id === filterId);
+      const options = filter ? getMultiFilterOptions(dataset, filter, state) : [];
+      state.multiSelects[filterId] = selected.size === options.length ? new Set() : selected;
       const summary = input.closest("details")?.querySelector(".multi-filter-summary");
-      if (summary && filter) summary.textContent = `${filter.label}: ${selected.size ? `${selected.size} selected` : "All"}`;
+      if (summary && filter) summary.textContent = `${filter.label}: ${getMultiFilterSummaryLabel(state.multiSelects[filterId])}`;
       scheduleFilterResultsRender(dataset, state);
     });
   });
@@ -14195,6 +14287,7 @@ function renderTable(dataset, state, filtered, renderContext = {}) {
   const frameWidth = Math.min(totalWidth || 320, TABLE_FRAME_LIMIT);
   const shellKey = `${dataset.id}|${getUiStateRenderKey(state)}|${visibleColumns.join("|")}`;
   const needsShellRebuild = elements.statsTable.dataset.shellKey !== shellKey || !elements.statsTableHead || !elements.statsTableBody;
+  elements.statsTable.dataset.datasetId = dataset.id;
   elements.tableWrapper.style.setProperty("--table-frame-width", `${frameWidth}px`);
   elements.statsTable.style.setProperty("--table-total-width", `${Math.max(totalWidth, 320)}px`);
   if (needsShellRebuild) {
@@ -14232,6 +14325,14 @@ function renderTable(dataset, state, filtered, renderContext = {}) {
       }
       const rowElement = event.target instanceof Element ? event.target.closest("tr") : null;
       if (rowElement && shouldToggleSelectedRow(dataset, event)) {
+        rowElement.classList.toggle("is-selected");
+      }
+    });
+    elements.statsTableBody.addEventListener("dblclick", (event) => {
+      const profileTarget = event.target instanceof Element ? event.target.closest("[data-player-profile-key]") : null;
+      if (profileTarget) return;
+      const rowElement = event.target instanceof Element ? event.target.closest("tr") : null;
+      if (rowElement && !rowElement.classList.contains("empty-state")) {
         rowElement.classList.toggle("is-selected");
       }
     });
@@ -14372,6 +14473,16 @@ function getColumnWidth(column, dataset) {
   const baseColumn = stripCompanionPrefix(column);
   if (isRelativeDisplayColumn(column)) return 38;
   if (column === "rank") return 24;
+  if (dataset?.id === "capitanesreference") {
+    if (isPlayerDisplayColumn(dataset, column)) return 130;
+    if (baseColumn === "league_name" || baseColumn === "league_list") return 220;
+    if (baseColumn === "team_name") return 300;
+    if (baseColumn === "nationality" || baseColumn === "nationality_list") return 128;
+    if (baseColumn === "height_in" || baseColumn === "weight_lb" || baseColumn === "age") return 42;
+    if (baseColumn === "gp" || baseColumn === "mpg" || baseColumn === "win_pct") return 42;
+    if (isSplitDisplayColumn(column)) return 44;
+    return 42;
+  }
   if (isSplitDisplayColumn(column)) return 74;
   if (baseColumn === dataset.yearColumn || baseColumn === "season") return 34;
   if (baseColumn === "age_range") return 48;
@@ -14622,6 +14733,12 @@ function formatSplitDisplayPct(value) {
   return clamped < 1 ? text.replace(/^0/, "") : text;
 }
 
+function formatSplitDisplayPctForDataset(dataset, value) {
+  if (!Number.isFinite(value)) return "";
+  if (dataset?.id === "capitanesreference") return (Math.max(0, Math.min(1, value)) * 100).toFixed(1);
+  return formatSplitDisplayPct(value);
+}
+
 function getSplitSortMetricValue(row, column, metric = "pct") {
   const stats = getSplitDisplayStats(row, column);
   if (!stats) {
@@ -14697,7 +14814,7 @@ function renderBodyCell(dataset, state, column, row, index, colorScale, relative
     ? index + 1
     : getRowColumnValue(dataset, row, column);
   const display = sanitizeCellDisplayValue(formatValue(dataset, column, rawValue, row));
-  const splitStats = !relativeDisplayCell && dataset.id !== "capitanesreference" && isSplitDisplayColumn(column)
+  const splitStats = !relativeDisplayCell && isSplitDisplayColumn(column)
     ? getSplitDisplayStats(row, column)
     : null;
   const classes = [];
@@ -14715,14 +14832,15 @@ function renderBodyCell(dataset, state, column, row, index, colorScale, relative
     ? getRelativeDisplayCellStyle(relativeDisplayCell)
     : getCellStyle(dataset, state, column, rawValue, colorScale, row);
   const styleAttribute = splitStats ? "" : (style ? ` style="${escapeAttribute(style)}"` : "");
+  const splitPctText = splitStats ? formatSplitDisplayPctForDataset(dataset, splitStats.ratio) : "";
   const splitDisplay = splitStats
-    ? `${Number.isFinite(splitStats.made) ? Math.round(splitStats.made) : 0}-${Number.isFinite(splitStats.att) ? Math.round(splitStats.att) : 0} ${formatSplitDisplayPct(splitStats.ratio)}`
+    ? `${Number.isFinite(splitStats.made) ? Math.round(splitStats.made) : 0}-${Number.isFinite(splitStats.att) ? Math.round(splitStats.att) : 0} ${splitPctText}`
     : "";
   const titleAttribute = splitStats
     ? ` title="${escapeAttribute(splitDisplay.trim())}"`
     : (rawValue != null && rawValue !== "" ? ` title="${escapeAttribute(display)}"` : "");
   const splitContent = splitStats
-    ? `<span class="split-display"><span class="split-display__pair"><span class="split-display__made">${escapeHtml(Number.isFinite(splitStats.made) ? Math.round(splitStats.made) : 0)}</span><span class="split-display__sep">-</span><span class="split-display__att">${escapeHtml(Number.isFinite(splitStats.att) ? Math.round(splitStats.att) : 0)}</span></span><span class="split-display__pct"${style ? ` style="${escapeAttribute(style)}"` : ""}>${escapeHtml(formatSplitDisplayPct(splitStats.ratio))}</span></span>`
+    ? `<span class="split-display"><span class="split-display__pair"><span class="split-display__made">${escapeHtml(Number.isFinite(splitStats.made) ? Math.round(splitStats.made) : 0)}</span><span class="split-display__sep">-</span><span class="split-display__att">${escapeHtml(Number.isFinite(splitStats.att) ? Math.round(splitStats.att) : 0)}</span></span><span class="split-display__pct"${style ? ` style="${escapeAttribute(style)}"` : ""}>${escapeHtml(splitPctText)}</span></span>`
     : "";
   const content = display && isPlayerDisplayColumn(dataset, column)
     ? (dataset.id === "capitanesreference" && getStringValue(row.realgm_summary_url).trim()
@@ -16995,6 +17113,7 @@ function isInverseColorColumn(column) {
   const baseColumn = stripCompanionPrefix(column);
   if (/^ast_pct_tov_pct$/i.test(baseColumn)) return false;
   if (/^tov_pct_def$/i.test(baseColumn)) return false;
+  if (/^(drtg|losses)$/i.test(baseColumn)) return true;
   if (/^he_(?:d_rapm|rapm_def_)/i.test(baseColumn)) return true;
   if (/^(sprint|lane_agility|modified_lane_agility|shuttle)$/i.test(baseColumn)) return true;
   return /(^tov$|_tov$|tov_|topct$|tov_pct$|fg_miss$|two_fg_miss$|three_fg_miss$|^adj_de$|^adrtg$|^ppp_def$|^efg_pct_def$|^ft_rate_def$|^two_p_pct_def$|^three_p_pct_def$|^opp_oreb_pct$|^opp_ast_pct$|^blocked_pct$)/i.test(baseColumn);
@@ -17042,6 +17161,7 @@ function getCachedColorBucketKey(state, row) {
 }
 
 function getCellStyle(dataset, state, column, value, colorScale, row) {
+  if (getStringValue(state?.extraSelects?.color_mode).trim() === "none") return "";
   if (!shouldColorColumn(dataset, column)) return "";
   if (typeof value !== "number" || !Number.isFinite(value)) return "";
   const fixedPercentile = getFixedBoundedPercentile(column, value);
@@ -17286,14 +17406,14 @@ function percentileFromSorted(arr, value) {
 
 function colorFromPercentile(pct) {
   const clamped = Math.min(1, Math.max(0, pct));
-  if (clamped >= 0.45 && clamped <= 0.55) {
+  if (clamped >= 0.495 && clamped <= 0.505) {
     return { bg: "#ffffff", color: "#111111" };
   }
-  if (clamped < 0.45) {
-    const t = smoothstep(Math.pow((0.45 - clamped) / 0.45, 1.15));
+  if (clamped < 0.495) {
+    const t = Math.pow((0.495 - clamped) / 0.495, 0.82);
     return interpolateColorStops(["#fff7f3", "#f8ddd4", "#efb8a8", "#dc856f", "#bd5945"], t);
   }
-  const t = smoothstep(Math.pow((clamped - 0.55) / 0.45, 1.15));
+  const t = Math.pow((clamped - 0.505) / 0.495, 0.82);
   return interpolateColorStops(["#f8fcf9", "#e5f2e8", "#c8e0cd", "#9bc8a4", "#68a977"], t);
 }
 
@@ -17363,7 +17483,8 @@ function updateSummary(dataset, state, filtered) {
   const careerMode = state?.extraSelects?.view_mode === "career";
   const selectedYears = getSummaryYearLabel(dataset, state, careerMode);
   const search = state.search.trim();
-  elements.filtersSummary.textContent = `Years: ${selectedYears} | Team: ${state.team === "all" ? "all" : state.team} | Search: ${search || "none"}`;
+  const capitanesFilterText = dataset?.id === "capitanesreference" ? ` | ${getCapitanesFilterSummary(dataset, state)}` : "";
+  elements.filtersSummary.textContent = `Years: ${selectedYears} | Team: ${state.team === "all" ? "all" : state.team} | Search: ${search || "none"}${capitanesFilterText}`;
   elements.resultsCount.textContent = "";
   const showingText = filtered.length ? `Showing ${Math.min(filtered.length, state.visibleCount).toLocaleString()} of ${filtered.length.toLocaleString()}` : "";
   if (dataset?.id === "player_career" && getPlayerCareerPendingYearsKey(state)) {
@@ -17464,6 +17585,7 @@ function renderFinderBar(dataset, state) {
 }
 
 function buildFinderQueryText(dataset, state) {
+  if (dataset?.id === "capitanesreference") return buildCapitanesFinderQueryText(dataset, state);
   const parts = [];
   if (state.search.trim()) parts.push(`Search: ${state.search.trim()}`);
   if (state.team !== "all") parts.push(`Team: ${state.team}`);
@@ -17495,6 +17617,60 @@ function buildFinderQueryText(dataset, state) {
 
   if (!parts.length) return "No quality filter.";
   return parts.join("; ");
+}
+
+function getCapitanesFilterSummary(dataset, state) {
+  return (dataset.multiFilters || [])
+    .map((filter) => `${filter.label}: ${getCompactMultiFilterSummary(state.multiSelects?.[filter.id])}`)
+    .join(" | ");
+}
+
+function getCompactMultiFilterSummary(selected) {
+  if (selected?.has(MULTI_FILTER_NONE_VALUE)) return "none";
+  return selected?.size ? `${selected.size} selected` : "all";
+}
+
+function buildCapitanesFinderQueryText(dataset, state) {
+  const filterParts = [];
+  (dataset.singleFilters || []).forEach((filter) => {
+    if (["view_mode", "color_mode", "percentile_mode"].includes(filter.id)) return;
+    const value = state.extraSelects[filter.id];
+    const defaultValue = getStringValue(filter.defaultValue ?? "all");
+    if (!value || value === "all" || value === defaultValue) return;
+    const label = getSingleFilterOptions(dataset, filter, state).find((option) => option.value === value)?.label || value;
+    filterParts.push(`${filter.label}: ${label}`);
+  });
+  (dataset.multiFilters || []).forEach((filter) => {
+    const selected = state.multiSelects[filter.id] || new Set();
+    if (!selected.size) return;
+    if (selected.has(MULTI_FILTER_NONE_VALUE)) {
+      filterParts.push(`${filter.label}: none`);
+      return;
+    }
+    const values = Array.from(selected);
+    filterParts.push(`${filter.label}: ${values.length <= 3 ? values.join("/") : `${values.length} selected`}`);
+  });
+
+  const infoParts = [];
+  Object.entries(state.demoFilters || {}).forEach(([column, filter]) => {
+    const minValue = getStringValue(filter?.min).trim();
+    const maxValue = getStringValue(filter?.max).trim();
+    if (!minValue && !maxValue) return;
+    if (minValue === getDefaultDemoFilterValue(dataset, column, "min") && maxValue === getDefaultDemoFilterValue(dataset, column, "max")) return;
+    infoParts.push(formatFilterRange(displayLabel(dataset, column), minValue, maxValue));
+  });
+
+  const statParts = [];
+  Object.entries(state.numericFilters || {}).forEach(([column, filter]) => {
+    if (!filter?.min && !filter?.max) return;
+    statParts.push(formatFilterRange(displayLabel(dataset, column), filter.min, filter.max));
+  });
+
+  const lines = [];
+  if (filterParts.length) lines.push(`Filters: ${filterParts.join("; ")}`);
+  if (infoParts.length) lines.push(`Info: ${infoParts.join("; ")}`);
+  if (statParts.length) lines.push(`Stats: ${statParts.join("; ")}`);
+  return lines.length ? lines.join("\n") : "No quality filter.";
 }
 
 function formatFilterRange(label, minValue, maxValue) {
@@ -17783,10 +17959,51 @@ function buildStatSearchText(row, datasetId = "") {
   return Array.from(values).join(" ");
 }
 
+function getMultiFilterSummaryLabel(selected) {
+  if (selected?.has(MULTI_FILTER_NONE_VALUE)) return "None";
+  return selected?.size ? `${selected.size} selected` : "All";
+}
+
+function getMultiFilterQuickActions(dataset, filter, state) {
+  if (dataset?.id !== "capitanesreference") return [];
+  if (filter.id === "league_name") {
+    return [
+      { action: "top_euro", label: "Top Euro", active: state.extraSelects?.exclude_major_europe === "yes" },
+      { action: "top_asia", label: "Top Asia", active: state.extraSelects?.exclude_major_asia === "yes" },
+    ];
+  }
+  if (filter.id === "nationality") {
+    const selected = state.multiSelects?.[filter.id] || new Set();
+    return [
+      { action: "country_mexico", label: "Mexico", active: selected.size === 1 && selected.has("Mexico") },
+    ];
+  }
+  return [];
+}
+
+function applyMultiFilterQuickAction(dataset, state, filter, action) {
+  if (dataset?.id !== "capitanesreference") return;
+  if (filter.id === "league_name" && action === "top_euro") {
+    state.extraSelects.exclude_major_europe = state.extraSelects.exclude_major_europe === "yes" ? "all" : "yes";
+    return;
+  }
+  if (filter.id === "league_name" && action === "top_asia") {
+    state.extraSelects.exclude_major_asia = state.extraSelects.exclude_major_asia === "yes" ? "all" : "yes";
+    return;
+  }
+  if (filter.id === "nationality" && action === "country_mexico") {
+    const selected = state.multiSelects?.[filter.id] || new Set();
+    state.multiSelects[filter.id] = selected.size === 1 && selected.has("Mexico") ? new Set() : new Set(["Mexico"]);
+  }
+}
+
 function enhanceCapitanesReferenceRow(row) {
   normalizeInternationalIdentity(row);
   normalizeDraftPickValue(row);
-  populateAgeFromDob(row);
+  populateCapitanesAge(row);
+  normalizeCapitanesPlayerName(row);
+  normalizeCapitanesLeagues(row);
+  populateCapitanesDerivedMetrics(row);
   if (!getStringValue(row.competition_label).trim()) {
     row.competition_label = getStringValue(row.league_name || row.league_list).trim();
   }
@@ -17804,6 +18021,120 @@ function enhanceCapitanesReferenceRow(row) {
   row.potential_latino_name = hasPotentialLatinoName(row.player_name) ? "Yes" : "";
   const porpag = calculateNeutralTorvikPorpag(row);
   if (Number.isFinite(porpag)) row.porpag = roundNumber(porpag, 2);
+}
+
+function normalizeCapitanesPlayerName(row) {
+  if (typeof row?.player_name === "string") row.player_name = normalizeDisplayName(row.player_name);
+  if (typeof row?.player === "string") row.player = normalizeDisplayName(row.player);
+}
+
+function populateCapitanesAge(row) {
+  const dobText = getStringValue(row?.dob || row?.birthday).trim();
+  if (!dobText) return;
+  const dob = new Date(`${dobText}T00:00:00`);
+  if (Number.isNaN(dob.getTime())) return;
+  const target = new Date("2026-06-23T00:00:00");
+  row.age = roundNumber((target - dob) / (1000 * 60 * 60 * 24 * 365.25), 1);
+}
+
+function populateCapitanesDerivedMetrics(row) {
+  const assists = firstFinite(row?.ast, Number.NaN);
+  const turnovers = firstFinite(row?.tov, Number.NaN);
+  if (Number.isFinite(assists) && Number.isFinite(turnovers)) {
+    row.a_to = turnovers > 0 ? roundNumber(assists / turnovers, 3) : "";
+  }
+  const minutes = firstFinite(row?.min, Number.NaN);
+  [
+    ["ows", "ows_per40"],
+    ["dws", "dws_per40"],
+    ["ws", "ws_per40"],
+  ].forEach(([source, target]) => {
+    const value = firstFinite(row?.[source], Number.NaN);
+    if (Number.isFinite(value) && Number.isFinite(minutes) && minutes > 0) {
+      row[target] = roundNumber((value / minutes) * 40, 3);
+    }
+  });
+}
+
+function normalizeCapitanesLeagues(row) {
+  const parts = capitanesLeagueParts(row);
+  if (!parts.length) return;
+  const normalized = Array.from(new Set(parts.map((part) => normalizeCapitanesLeagueName(part)).filter(Boolean)));
+  const leagueText = normalized.join(" / ");
+  row.league_name = leagueText;
+  row.league_list = leagueText;
+}
+
+function normalizeCapitanesLeagueName(value) {
+  const text = getStringValue(value).trim().replace(/\s+/g, " ");
+  const key = normalizeDirectiveValue(text);
+  const aliases = {
+    a_bundeslig: "Austrian A Bundesliga",
+    austrian_a_bundesliga: "Austrian A Bundesliga",
+    australian_nbl: "AUS NBL",
+    aus_nbl: "AUS NBL",
+    japanese_bleague: "B.League",
+    b_league: "B.League",
+    bleague: "B.League",
+    basketball_super_league: "T-BSL",
+    bsl: "T-BSL",
+    belarusian_bpl: "BPL",
+    bosnian_bih_liga: "BiH Liga",
+    bnxt_league: "BNXT",
+    brazilian_nbb: "NBB",
+    bulgarian_nbl: "BUL NBL",
+    chinese_cba: "CBA",
+    croatian_a_1_liga: "A-1 Liga",
+    cypriot_division_a: "CYP DivA",
+    czech_nbl: "CZ NBL",
+    danish_basketligaen: "Basketligaen",
+    estonian_latvian_basketball_league: "ELBL",
+    finnish_korisliiga: "Korisliiga",
+    french_jeep_elite: "Jeep Elite",
+    french_lnb_espoirs: "LNB Espoirs",
+    french_lnb_pro_b: "LNB Pro B",
+    french_nm1: "NM1",
+    g_pro_a: "German Pro A",
+    g_pro_b: "German Pro B",
+    german_pro_a: "German Pro A",
+    german_pro_b: "German Pro B",
+    german_bbl: "G-BBL",
+    georgian_super_liga: "Super Liga",
+    greek_heba_a1: "HEBA A1",
+    greek_heba_a2: "HEBA A2",
+    israeli_bsl: "I-BSL",
+    italian_lega_basket_serie_a: "Lega A",
+    italian_serie_a2_basket: "Legadue Gold",
+    kosovo_fbk: "FBK",
+    lithuanian_lkl: "LKL",
+    lithuanian_nkl: "NKL",
+    macedonian_superleague: "Ma Superleague",
+    mexican_cibacopa: "CIBACOPA",
+    mexican_lnbp: "LNBP",
+    montenegrin_prva_a_liga: "Mo Prva A",
+    norwegian_blno: "BLNO",
+    polish_obl: "P-OBL",
+    portuguese_lpb: "P-LPB",
+    puerto_rican_bsn: "BSN",
+    romanian_divizia_a: "ROM DivA",
+    serbian_kls: "KLS",
+    slovakian_extraliga: "Extraliga",
+    slovenian_skl: "SKL",
+    south_korean_kbl: "KBL",
+    spanish_acb: "ACB",
+    spanish_primera_feb: "Primera FEB",
+    spanish_segunda_feb: "Segunda FEB",
+    swiss_lna: "LNA",
+    turkish_bsl: "T-BSL",
+    turkish_tbl: "T-TBL",
+    super_league_basketball: "Uk Superleague",
+    ukrainian_superleague: "Uk Superleague",
+    venezuelan_slb: "V-SLB",
+    slb: "V-SLB",
+    v_slb: "V-SLB",
+    vtb_united_league: "VTB United",
+  };
+  return aliases[key] || text;
 }
 
 function calculateNeutralTorvikPorpag(row) {
@@ -19052,7 +19383,8 @@ function normalizeDisplayName(value) {
   if (!text) return "";
   if (text.includes(",")) {
     const parts = text.split(",").map((part) => part.trim()).filter(Boolean);
-    if (parts.length === 2) text = `${parts[1]} ${parts[0]}`;
+    if (parts.length === 2 && isNameSuffixToken(parts[1])) text = `${parts[0]} ${parts[1]}`;
+    else if (parts.length === 2) text = `${parts[1]} ${parts[0]}`;
     else if (parts.length >= 3) text = `${parts[1]} ${parts[0]} ${parts.slice(2).join(" ")}`;
   }
   const letters = text.replace(/[^A-Za-z]/g, "");
@@ -19087,6 +19419,10 @@ function normalizeDisplayName(value) {
     .replace(/\bJR\.?$/i, "Jr.")
     .replace(/\bSR\.?$/i, "Sr.")
     .trim();
+}
+
+function isNameSuffixToken(value) {
+  return /^(?:jr\.?|sr\.?|ii|iii|iv|v|vi|vii|viii|ix|x)$/i.test(getStringValue(value).trim());
 }
 
 function normalizeDisplayNameToken(token) {
@@ -20780,6 +21116,10 @@ function formatValue(dataset, column, value, row) {
   if (isRelativeDisplayColumn(column)) return value.toFixed(0);
   if (column === "draft_pick" && row?._draftPickBlank) return "";
   if (column === "rank") return String(value);
+  if (dataset?.id === "capitanesreference" && stripCompanionPrefix(column) === "height_in") return formatHeightFeetInches(value);
+  if (dataset?.id === "capitanesreference" && stripCompanionPrefix(column) === "win_pct") return value.toFixed(2);
+  if (dataset?.id === "capitanesreference" && /^(ows_per40|dws_per40|ws_per40)$/i.test(stripCompanionPrefix(column))) return value.toFixed(3);
+  if (dataset?.id === "capitanesreference" && stripCompanionPrefix(column) === "a_to") return value.toFixed(2);
   if (/^(season|year|rookie_year)$/i.test(column) && Number.isInteger(value)) return String(value);
   if (column === "age") return value.toFixed(1);
   if (column === "exp") return value.toFixed(2);
@@ -20814,6 +21154,12 @@ function formatValue(dataset, column, value, row) {
 
   if (Number.isInteger(value)) return String(value);
   return value.toFixed(1);
+}
+
+function formatHeightFeetInches(value) {
+  const inches = Math.round(Number(value));
+  if (!Number.isFinite(inches) || inches <= 0) return "";
+  return `${Math.floor(inches / 12)}-${inches % 12}`;
 }
 
 function looksPercentColumn(column) {
@@ -20860,10 +21206,12 @@ function isPlayerDisplayColumn(dataset, column) {
 }
 
 function isLeftAligned(dataset, column) {
+  if (dataset?.id === "capitanesreference" && ["league_name", "team_name", "nationality", "nationality_list"].includes(stripCompanionPrefix(column))) return true;
   return false;
 }
 
 function isWrapColumn(dataset, column) {
+  if (dataset?.id === "capitanesreference" && ["league_name", "team_name", "nationality", "nationality_list"].includes(stripCompanionPrefix(column))) return true;
   if (isTeamDisplayColumn(dataset, column)) return false;
   return column === dataset?.playerColumn
     || column === "profile_levels"
