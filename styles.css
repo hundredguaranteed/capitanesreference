@@ -1,0 +1,399 @@
+:root {
+  color-scheme: light;
+  --ink: #17211d;
+  --muted: #5c6963;
+  --line: #d8dfd9;
+  --soft: #f4f7f3;
+  --panel: #ffffff;
+  --accent: #116b5f;
+  --accent-strong: #0b4e45;
+  --gold: #a36719;
+  --danger: #a5382f;
+  --shadow: 0 1px 3px rgba(23, 33, 29, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f8faf7;
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 1px solid #b8c4bd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0.45rem 0.7rem;
+}
+
+button:hover,
+button[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+button.primary:hover {
+  background: var(--accent-strong);
+  color: #fff;
+}
+
+input {
+  border: 1px solid #b8c4bd;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  padding: 0.44rem 0.55rem;
+  min-width: 0;
+}
+
+input:focus,
+button:focus-visible {
+  outline: 2px solid rgba(17, 107, 95, 0.3);
+  outline-offset: 2px;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+  gap: 1rem;
+  align-items: end;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.topbar h1 {
+  margin: 0 0 0.2rem;
+  font-size: 1.35rem;
+  letter-spacing: 0;
+}
+
+.topbar p,
+.source-note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.source-note {
+  font-size: 0.86rem;
+  border-left: 3px solid var(--gold);
+  padding-left: 0.8rem;
+}
+
+main {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+.query-strip,
+.filter-grid,
+.columns-panel,
+.result-head {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.query-strip {
+  display: grid;
+  grid-template-columns: minmax(240px, 2fr) repeat(5, minmax(96px, 0.7fr)) auto auto;
+  gap: 0.65rem;
+  align-items: end;
+  padding: 0.8rem;
+}
+
+label {
+  display: grid;
+  gap: 0.28rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+label input {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.search-box input {
+  min-width: 14rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+
+.filter-block {
+  background: var(--panel);
+  padding: 0.75rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.filter-block summary,
+.columns-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.7rem 0;
+}
+
+.inline-check {
+  display: inline-flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2rem;
+  color: var(--ink);
+  font-size: 0.86rem;
+}
+
+.inline-check input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.mini-search {
+  width: 100%;
+  margin-bottom: 0.55rem;
+}
+
+.check-grid,
+.column-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  gap: 0.35rem 0.65rem;
+  max-height: 15rem;
+  overflow: auto;
+  padding: 0.25rem 0.1rem 0.1rem;
+}
+
+.league-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.check-grid label,
+.column-list label {
+  display: flex;
+  align-items: start;
+  gap: 0.38rem;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.check-grid input,
+.column-list input {
+  margin-top: 0.12rem;
+}
+
+.columns-panel {
+  padding: 0.75rem;
+}
+
+.column-list {
+  max-height: 11rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.count-pill {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.72rem 0.8rem;
+}
+
+#resultMeta {
+  color: var(--muted);
+  margin-left: 0.4rem;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chip {
+  border: 1px solid #c9d3ce;
+  background: var(--soft);
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.chip.warn {
+  border-color: #e1c6ad;
+  background: #fff7ec;
+  color: #7f4810;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow);
+  max-height: calc(100vh - 13rem);
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 2400px;
+  width: max-content;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e2e7e2;
+  border-right: 1px solid #edf1ed;
+  padding: 0.48rem 0.55rem;
+  vertical-align: top;
+  background: #fff;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #edf3ee;
+  color: #24312b;
+  font-size: 0.75rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th button {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-weight: 800;
+}
+
+tbody tr:hover td {
+  background: #f8fbf8;
+}
+
+td {
+  max-width: 9rem;
+  min-width: 5.6rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+td.player-cell {
+  min-width: 210px;
+  max-width: 250px;
+}
+
+td.team-cell {
+  min-width: 260px;
+  max-width: 360px;
+}
+
+td.league-cell {
+  min-width: 320px;
+  max-width: 460px;
+}
+
+td.country-cell {
+  min-width: 160px;
+  max-width: 240px;
+}
+
+a {
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.subflag {
+  display: block;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-top: 0.15rem;
+}
+
+.empty-row td {
+  color: var(--muted);
+  padding: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .topbar,
+  .filter-grid,
+  .query-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .source-note {
+    border-left: 0;
+    border-top: 3px solid var(--gold);
+    padding: 0.55rem 0 0;
+  }
+
+  .table-wrap {
+    max-height: none;
+  }
+}

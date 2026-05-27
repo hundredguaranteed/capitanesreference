@@ -1,0 +1,3 @@
+http_server.*.log
+http_server.pid
+screenshot-*.png
