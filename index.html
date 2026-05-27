@@ -21,7 +21,15 @@
       <section class="query-strip" aria-label="Quick query controls">
         <label class="search-box">
           <span>Search</span>
-          <input id="searchInput" type="search" placeholder="Player, team, league, nation">
+          <input id="searchInput" type="search" placeholder="Player, team, league, nation, status:NCAA">
+        </label>
+        <label>
+          <span>Status</span>
+          <select id="statusFilter">
+            <option value="all">All</option>
+            <option value="ncaa">NCAA</option>
+            <option value="non_ncaa">Non-NCAA</option>
+          </select>
         </label>
         <label>
           <span>Age min</span>
@@ -111,6 +119,7 @@
     </main>
 
     <script src="data/capitanesreference_2026.js"></script>
+    <script src="data/ncaa_status_2026.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

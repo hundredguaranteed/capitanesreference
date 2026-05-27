@@ -42,12 +42,14 @@
 
   const MAJOR_EURO_TERMS = ["euroleague", "eurocup"];
   const MAJOR_ASIA_TERMS = ["b.league", "bleague", "cba"];
+  const NCAA_STATUS_IDS = new Set((window.CAPITANESREFERENCE_NCAA_STATUS_IDS || []).map(String));
 
   const columns = [
     { key: "player_name", label: "Player", group: "Demo", className: "player-cell", render: renderPlayer },
     { key: "team_name", label: "Team", group: "Demo", className: "team-cell" },
     { key: "league_list", label: "League", group: "Demo", className: "league-cell" },
     { key: "nationality_list", label: "Nation", group: "Demo", className: "country-cell" },
+    { key: "ncaa_status", label: "Status", group: "Demo" },
     { key: "height_in", label: "HT", group: "Demo", render: (row) => formatHeight(row.height_in) },
     { key: "weight_lb", label: "WT", group: "Demo", numeric: true, decimals: 0 },
     { key: "age", label: "Age", group: "Demo", numeric: true, decimals: 1 },
@@ -149,7 +151,7 @@
 
   const columnByKey = new Map(columns.map((column) => [column.key, column]));
   const defaultColumnKeys = [
-    "player_name", "team_name", "league_list", "nationality_list", "height_in", "weight_lb", "age", "gp", "min", "mpg",
+    "player_name", "team_name", "league_list", "nationality_list", "ncaa_status", "height_in", "weight_lb", "age", "gp", "min", "mpg",
     "wins", "losses", "win_pct", "ows", "dws", "ws", "orb_pct", "drb_pct", "trb_pct", "ast_pct", "tov_pct", "stl_pct",
     "blk_pct", "usg_pct", "ppr", "pps", "ortg", "drtg", "ediff", "fic", "per",
     "two_p_pct", "two_pa", "three_p_pct", "three_pa", "ft_pct", "fta", "efg_pct", "ts_pct",
@@ -166,6 +168,7 @@
     countrySearch: "",
     leagueSearch: "",
     search: "",
+    statusFilter: "all",
     ageMin: 22.5,
     orbMin: null,
     astMin: null,
@@ -197,7 +200,7 @@
 
   function bindElements() {
     [
-      "searchInput", "ageMin", "orbMin", "astMin", "perMin", "atoMin", "latinoQuery", "copyQuery",
+      "searchInput", "statusFilter", "ageMin", "orbMin", "astMin", "perMin", "atoMin", "latinoQuery", "copyQuery",
       "countryAll", "countryNone", "countryLatino", "includePotentialLatino", "countrySearch", "countryList", "countryCount",
       "leagueAll", "leagueNone", "excludeEuro", "excludeAsia", "leagueSearch", "leagueList", "leagueCount",
       "defaultColumns", "allColumns", "clearColumns", "columnList", "resultCount", "resultMeta", "activeFilters",
@@ -209,7 +212,11 @@
 
   function bindEvents() {
     el.searchInput.addEventListener("input", () => {
-      state.search = el.searchInput.value.trim();
+      applySearchValue(el.searchInput.value);
+      render();
+    });
+    el.statusFilter.addEventListener("change", () => {
+      state.statusFilter = el.statusFilter.value;
       render();
     });
     [
@@ -293,6 +300,24 @@
     });
   }
 
+  function applySearchValue(rawValue) {
+    let search = String(rawValue || "");
+    search = search.replace(/(^|\s)status:([^\s,;]+)/gi, (match, prefix, rawStatus) => {
+      const normalized = normalizeDirectiveValue(rawStatus);
+      if (normalized === "ncaa" || normalized === "d1") state.statusFilter = "ncaa";
+      if (normalized === "non_ncaa" || normalized === "not_ncaa" || normalized === "no_ncaa") state.statusFilter = "non_ncaa";
+      if (normalized === "all" || normalized === "any") state.statusFilter = "all";
+      return prefix;
+    });
+    state.search = search.replace(/\s{2,}/g, " ").trim();
+    if (el.searchInput && el.searchInput.value !== state.search) {
+      el.searchInput.value = state.search;
+    }
+    if (el.statusFilter) {
+      el.statusFilter.value = state.statusFilter;
+    }
+  }
+
   function parseRows(csv) {
     const records = parseCsv(csv);
     if (!records.length) return [];
@@ -308,10 +333,12 @@
       row.nationality_list = row.nationality_list || row.nationality || "Unknown";
       row._countries = splitList(row.nationality_list);
       row._leagues = splitList(row.league_list);
+      row.ncaaStatus = NCAA_STATUS_IDS.has(String(row.realgm_player_id || ""));
+      row.ncaa_status = row.ncaaStatus ? "NCAA" : "";
       row._countryNorm = normalize(row.nationality_list);
       row._leagueNorm = normalize(row.league_list);
       row._searchNorm = normalize([
-        row.player_name, row.team_name, row.team_abbrev, row.league_list, row.nationality_list
+        row.player_name, row.team_name, row.team_abbrev, row.league_list, row.nationality_list, row.ncaa_status
       ].join(" "));
       row.verifiedLatino = row._countries.some((country) => LATINO_COUNTRIES.has(country));
       row.potentialLatinoName = hasPotentialLatinoName(row.player_name);
@@ -385,6 +412,8 @@
     const searchNorm = normalize(state.search);
     return state.allRows.filter((row) => {
       if (searchNorm && !row._searchNorm.includes(searchNorm)) return false;
+      if (state.statusFilter === "ncaa" && !row.ncaaStatus) return false;
+      if (state.statusFilter === "non_ncaa" && row.ncaaStatus) return false;
       if (Number.isFinite(state.ageMin) && (!Number.isFinite(row.age) || row.age < state.ageMin)) return false;
       if (!passesMin(row.orb_pct, state.orbMin)) return false;
       if (!passesMin(row.ast_pct, state.astMin)) return false;
@@ -451,6 +480,8 @@
     if (Number.isFinite(state.astMin)) chips.push(`AST% >= ${state.astMin}`);
     if (Number.isFinite(state.perMin)) chips.push(`PER >= ${state.perMin}`);
     if (Number.isFinite(state.atoMin)) chips.push(`A:TO >= ${state.atoMin}`);
+    if (state.statusFilter === "ncaa") chips.push("Status: NCAA");
+    if (state.statusFilter === "non_ncaa") chips.push("Status: Non-NCAA");
     if (state.includePotentialLatino) chips.push("Potential Latino names included");
     if (state.excludeEuro) chips.push("Euroleague/Eurocup excluded");
     if (state.excludeAsia) chips.push("B.League/CBA excluded");
@@ -545,6 +576,7 @@
 
   function syncInputs() {
     el.searchInput.value = state.search;
+    el.statusFilter.value = state.statusFilter;
     el.ageMin.value = Number.isFinite(state.ageMin) ? state.ageMin : "";
     el.orbMin.value = Number.isFinite(state.orbMin) ? state.orbMin : "";
     el.astMin.value = Number.isFinite(state.astMin) ? state.astMin : "";
@@ -567,6 +599,7 @@
     state.excludeEuro = false;
     state.excludeAsia = false;
     state.search = "";
+    state.statusFilter = "all";
     state.ageMin = 22.5;
     state.orbMin = 18;
     state.astMin = 13;
@@ -601,7 +634,10 @@
       applyLatinoBigsState();
       return;
     }
-    state.search = params.get("q") || state.search;
+    applySearchValue(params.get("q") || state.search);
+    if (["all", "ncaa", "non_ncaa"].includes(params.get("status"))) {
+      state.statusFilter = params.get("status");
+    }
     state.ageMin = parseOptionalNumber(params.get("ageMin") ?? state.ageMin);
     state.orbMin = parseOptionalNumber(params.get("orbMin"));
     state.astMin = parseOptionalNumber(params.get("astMin"));
@@ -635,6 +671,7 @@
       return;
     }
     if (state.search) params.set("q", state.search);
+    if (state.statusFilter !== "all") params.set("status", state.statusFilter);
     if (Number.isFinite(state.ageMin) && state.ageMin !== 22.5) params.set("ageMin", String(state.ageMin));
     if (Number.isFinite(state.orbMin)) params.set("orbMin", String(state.orbMin));
     if (Number.isFinite(state.astMin)) params.set("astMin", String(state.astMin));
@@ -657,6 +694,7 @@
   function isLatinoBigsPreset() {
     const presentLatino = getPresentLatinoCountries();
     return state.search === ""
+      && state.statusFilter === "all"
       && Number.isFinite(state.ageMin) && state.ageMin === 22.5
       && Number.isFinite(state.orbMin) && state.orbMin === 18
       && Number.isFinite(state.astMin) && state.astMin === 13
@@ -753,6 +791,10 @@
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
+  }
+
+  function normalizeDirectiveValue(value) {
+    return normalize(value).replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
   }
 
   function cssId(value) {
