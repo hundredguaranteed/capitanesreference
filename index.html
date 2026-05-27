@@ -1,125 +1,149 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Capitanes Reference</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <header class="topbar">
-      <div>
-        <h1>Capitanes Reference</h1>
-        <p>2025-26 RealGM international player table with queryable leagues, nationality filters, advanced stats, shooting, and PRPG! estimate.</p>
-      </div>
-      <div class="source-note">
-        Data: RealGM first five GP-sorted stat pages. PRPG! follows Bart Torvik's final formula with neutral opponent adjustment.
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capitanes Reference</title>
+  <meta name="description" content="Standalone Capitanes Reference explorer using the 100guaranteed stat explorer interface.">
+  <link rel="stylesheet" href="styles.css?v=20260527-capitanes-v3">
+  <script>
+window.__DATA_ASSET_BASE__ = "";
+(function () {
+  var version = "20260527-capitanes-v3";
+  ["data/vendor/capitanesreference_2026.js", "data/vendor/status_realgm_index.js"].forEach(function (src) {
+    var link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "script";
+    link.href = src + "?v=" + encodeURIComponent(version);
+    document.head.appendChild(link);
+  });
+}());
+  </script>
+  <script src="app.js?v=20260527-capitanes-v3" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-topline">
+      <a class="site-eyebrow topline-link" href="#capitanesreference">Capitanes Reference</a>
+    </div>
+    <div class="global-player-search">
+      <label class="field-label global-player-search__label" for="globalPlayerSearchInput">Player</label>
+      <input class="form-control global-player-search__input" id="globalPlayerSearchInput" type="search" list="globalPlayerSearchSuggestions" placeholder="Find player">
+      <datalist id="globalPlayerSearchSuggestions"></datalist>
+    </div>
+    <div class="site-header__inner">
+      <h1 id="pageTitle">100guaranteed</h1>
+    </div>
+    <p class="site-subtitle" id="pageSubtitle"></p>
+    <nav class="league-nav" id="leagueNav" aria-label="Explorer pages"></nav>
+  </header>
 
-    <main>
-      <section class="query-strip" aria-label="Quick query controls">
-        <label class="search-box">
-          <span>Search</span>
-          <input id="searchInput" type="search" placeholder="Player, team, league, nation, status:NCAA">
-        </label>
-        <label>
-          <span>Status</span>
-          <select id="statusFilter">
-            <option value="all">All</option>
-            <option value="ncaa">NCAA</option>
-            <option value="non_ncaa">Non-NCAA</option>
-          </select>
-        </label>
-        <label>
-          <span>Age min</span>
-          <input id="ageMin" type="number" min="0" max="60" step="0.1" value="22.5">
-        </label>
-        <label>
-          <span>OREB% min</span>
-          <input id="orbMin" type="number" step="0.1" placeholder="Any">
-        </label>
-        <label>
-          <span>AST% min</span>
-          <input id="astMin" type="number" step="0.1" placeholder="Any">
-        </label>
-        <label>
-          <span>PER min</span>
-          <input id="perMin" type="number" step="0.1" placeholder="Any">
-        </label>
-        <label>
-          <span>A:TO min</span>
-          <input id="atoMin" type="number" step="0.1" placeholder="Any">
-        </label>
-        <button id="latinoQuery" class="primary" type="button">Run Latino bigs query</button>
-        <button id="copyQuery" type="button">Copy query link</button>
-      </section>
+  <div class="status-bar">
+    <div class="status-pill" id="statusPill">Preparing data</div>
+    <div class="status-summary" id="filtersSummary"></div>
+  </div>
 
-      <section class="filter-grid" aria-label="Filters">
-        <details class="filter-block" open>
-          <summary>
-            <span>Countries</span>
-            <span id="countryCount" class="count-pill"></span>
-          </summary>
-          <div class="button-row">
-            <button id="countryAll" type="button">Select all</button>
-            <button id="countryNone" type="button">Unselect all</button>
-            <button id="countryLatino" type="button">Latino only</button>
-            <label class="inline-check">
-              <input id="includePotentialLatino" type="checkbox">
-              Potentially Latino names
-            </label>
-          </div>
-          <input id="countrySearch" class="mini-search" type="search" placeholder="Filter countries">
-          <div id="countryList" class="check-grid"></div>
-        </details>
-
-        <details class="filter-block" open>
-          <summary>
-            <span>Leagues</span>
-            <span id="leagueCount" class="count-pill"></span>
-          </summary>
-          <div class="button-row">
-            <button id="leagueAll" type="button">Select all</button>
-            <button id="leagueNone" type="button">Unselect all</button>
-            <button id="excludeEuro" type="button" aria-pressed="false">Exclude Euroleague/Eurocup</button>
-            <button id="excludeAsia" type="button" aria-pressed="false">Exclude B.League/CBA</button>
-          </div>
-          <input id="leagueSearch" class="mini-search" type="search" placeholder="Filter leagues">
-          <div id="leagueList" class="check-grid league-grid"></div>
-        </details>
-      </section>
-
-      <section class="columns-panel" aria-label="Column controls">
-        <details>
-          <summary>Columns</summary>
-          <div class="button-row">
-            <button id="defaultColumns" type="button">Default</button>
-            <button id="allColumns" type="button">Show all stats</button>
-            <button id="clearColumns" type="button">Clear</button>
-          </div>
-          <div id="columnList" class="column-list"></div>
-        </details>
-      </section>
-
-      <section class="result-head">
-        <div>
-          <strong id="resultCount">0 players</strong>
-          <span id="resultMeta"></span>
+  <div class="app-shell">
+    <aside class="query-panel" id="queryPanel">
+      <section class="panel-section">
+        <div class="section-header-row">
+          <h2>View</h2>
         </div>
-        <div id="activeFilters" class="active-filters"></div>
+        <div class="select-stack" id="viewModeFilters"></div>
       </section>
 
-      <section class="table-wrap" aria-label="Capitanes Reference results">
-        <table id="resultsTable">
-          <thead id="tableHead"></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <section class="panel-section">
+        <div class="section-header-row">
+          <h2>Years</h2>
+          <div class="bulk-actions">
+            <button class="link-button" id="selectAllYearsBtn" type="button">All</button>
+            <button class="link-button" id="selectLatestYearBtn" type="button">Latest</button>
+            <button class="link-button" id="clearYearsBtn" type="button">None</button>
+          </div>
+        </div>
+        <div class="pill-grid" id="yearPills"></div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-header-row">
+          <h2>Search</h2>
+        </div>
+        <div class="field-stack field-stack--compact">
+          <label class="field-label" for="searchInput">Player</label>
+          <input class="form-control" id="searchInput" type="text" placeholder="Start typing">
+          <datalist id="searchSuggestions"></datalist>
+        </div>
+        <div class="select-stack" id="singleSelectFilters"></div>
+        <div class="multi-filter-stack" id="multiSelectFilters"></div>
+        <div class="field-stack field-stack--compact field-stack--inline">
+          <label class="field-label" for="teamSelect">Team</label>
+          <select class="form-control" id="teamSelect">
+            <option value="all">All teams</option>
+          </select>
+        </div>
+        <div class="embedded-demo-controls" id="demoControls">
+          <div class="section-header-row section-header-row--inline">
+            <h2>Info</h2>
+            <div class="bulk-actions">
+              <button class="link-button" id="demoDefaultsBtn" type="button">Default</button>
+              <button class="link-button" id="demoAllBtn" type="button">All</button>
+              <button class="link-button" id="demoClearBtn" type="button">Clear</button>
+            </div>
+          </div>
+          <div class="pill-grid" id="demoToggles"></div>
+          <div class="demo-range-grid" id="demoRangeFilters"></div>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-header-row">
+          <h2>Stat Filters</h2>
+          <div class="bulk-actions">
+            <button class="link-button" id="statCompressBtn" type="button">Compress</button>
+            <button class="link-button" id="statExpandBtn" type="button">Expand</button>
+          </div>
+        </div>
+        <div id="statGroups"></div>
+      </section>
+    </aside>
+
+    <main class="table-area">
+      <section class="home-content" id="homeContent" hidden></section>
+      <section class="table-content" id="tableContent">
+        <div class="table-toolbar">
+          <div class="finder-topbar">
+            <div class="finder-year-row">
+              <select class="finder-year-select" id="yearQuickSelect"></select>
+            </div>
+            <div class="finder-query" id="finderQuery"></div>
+            <div class="finder-title" id="finderTitle"></div>
+          </div>
+          <div>
+            <div class="results-count" id="resultsCount">Loading dataset...</div>
+            <div class="results-subtitle" id="resultsSubtitle"></div>
+          </div>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper">
+          <table id="statsTable">
+            <thead id="statsTableHead"></thead>
+            <tbody id="statsTableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <button class="link-button load-more-link" id="loadMoreBtn" type="button" hidden>Add 40 More</button>
+          <div class="table-legend" id="tableLegend"></div>
+        </div>
       </section>
     </main>
+  </div>
 
-    <script src="data/capitanesreference_2026.js?v=20260526"></script>
-    <script src="data/ncaa_status_2026.js?v=20260526"></script>
-    <script src="app.js?v=20260526"></script>
-  </body>
+  <template id="statGroupTemplate">
+    <section class="stat-group">
+      <div class="stat-group__header"></div>
+      <div class="stat-group__body"></div>
+    </section>
+  </template>
+
+</body>
 </html>
