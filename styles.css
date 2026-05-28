@@ -8,9 +8,9 @@
   --active-fill: #e0d7c6;
   --low-fill: #efd9d2;
   --high-fill: #dbe7ef;
-  --shell-width: 4600px;
+  --shell-width: 3600px;
   --sidebar-width: 248px;
-  --table-max-width: 4200px;
+  --table-max-width: 3200px;
   --shell-gap: 96px;
   --num-col-width: 42px;
   --small-col-width: 36px;
@@ -320,10 +320,18 @@ a,
   max-width: 190px;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
 }
 
-.multi-pill-group--select:not([open]) > :not(summary) {
+.multi-pill-group--select:not([open]) > :not(summary):not(.filter-visibility-toggle) {
   display: none;
+}
+
+.multi-pill-group--select > .filter-visibility-toggle {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
 }
 
 .multi-filter-select {
@@ -339,6 +347,7 @@ a,
 
 .multi-filter-summary {
   padding: 4px 6px;
+  padding-right: 48px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #fff;
@@ -591,6 +600,13 @@ a,
   box-shadow: inset 0 2px 0 rgba(226, 154, 41, 0.9), inset 0 -2px 0 rgba(226, 154, 41, 0.9);
 }
 
+#statsTable[data-dataset-id="capitanesreference"] th,
+#statsTable[data-dataset-id="capitanesreference"] td {
+  padding-left: 0;
+  padding-right: 0;
+  font-size: 8px;
+}
+
 #statsTable th.cell-group-start,
 #statsTable td.cell-group-start {
   border-left: 1px solid rgba(8, 35, 63, 0.18);
@@ -679,8 +695,8 @@ a,
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  font-size: 7.7px;
-  line-height: 1.05;
+  font-size: 7.1px;
+  line-height: 1.02;
 }
 
 #statsTable[data-dataset-id="capitanesreference"] th[data-sort="league_name"],
